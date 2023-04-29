@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment: 
+      - PGDATABASE=postgres
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+      - PGRST_JWT_SECRET=$PGRST_JWT_SECRET
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:15-alpine3.17
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+  postgrest:
+    image: postgrest/postgrest:v11.0.0
+    depends_on:
+      - postgres
+    restart: always
+    environment:
+      - PGRST_DB_URI=postgres://postgres:postgres@postgres:5432/postgres
+      - PGRST_OPENAPI_SERVER_PROXY_URI=http://0.0.0.0:3000
+      - PGRST_DB_SCHEMA=public
+      - PGRST_DB_ANON_ROLE=anon
+      - PGRST_JWT_SECRET=$PGRST_JWT_SECRET
+    ports:
+      - '6543:3000'
+
+volumes:
+  postgres:
