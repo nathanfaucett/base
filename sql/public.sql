@@ -244,7 +244,3 @@ $function$;
 
 GRANT EXECUTE ON FUNCTION 
 	public.user_reset_password(p_username text, p_old_password text, p_password text, p_password_confirmation text) TO "user";
-
-
-GRANT ALL ON ALL TABLES IN SCHEMA public TO "admin";
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO "admin";

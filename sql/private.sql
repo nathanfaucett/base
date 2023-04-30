@@ -1,5 +1,7 @@
 CREATE SCHEMA "private";
 
+GRANT USAGE ON SCHEMA "private" TO "user";
+
 
 CREATE TABLE "private"."user" (
 	id serial4 NOT NULL,

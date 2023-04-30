@@ -3,7 +3,6 @@ CREATE EXTENSION pgcrypto WITH SCHEMA "auth";
 
 GRANT USAGE ON SCHEMA auth TO anon;
 GRANT USAGE ON SCHEMA auth TO "user";
-GRANT USAGE ON SCHEMA auth TO "admin";
 
 
 CREATE FUNCTION auth.id()

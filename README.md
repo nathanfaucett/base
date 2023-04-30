@@ -1,13 +1,13 @@
 ```bash
 curl http://localhost:6543/user \
    -H "Accept: application/json" \
-   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOm51bGwsInJvbGUiOiJhZG1pbiIsIm5vbmNlIjoiY2Q0NWM2Y2M2MWU5NDMzNmFiZjEzYThkNzdlYzMxY2MiLCJleHAiOjE2ODI4Njc1MDEuNDc0ODc3fQ.O36gusy3wIdRV-H-Quhrz6Yde6BKGwDM4a8RNLCak-s"
+   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOm51bGwsInJvbGUiOiJhZG1pbiIsIm5vbmNlIjoiODRhNjMzY2U0M2I5ZmE2Y2Y0NTlmNGI2MjlkMTkyYzEiLCJleHAiOjE2ODI5NTAzNDkuNzM5OTcxfQ.Cqy32y4AuXqoP6NFkw9Sv5EuJRsOYe0Qo8l0hAJ8JhE"
 ```
 
 ```bash
 curl http://localhost:6543/user?select=\*,email\(\*\) \
    -H "Accept: application/json" \
-   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOm51bGwsInJvbGUiOiJhZG1pbiIsIm5vbmNlIjoiY2Q0NWM2Y2M2MWU5NDMzNmFiZjEzYThkNzdlYzMxY2MiLCJleHAiOjE2ODI4Njc1MDEuNDc0ODc3fQ.O36gusy3wIdRV-H-Quhrz6Yde6BKGwDM4a8RNLCak-s"
+   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOm51bGwsInJvbGUiOiJhZG1pbiIsIm5vbmNlIjoiODRhNjMzY2U0M2I5ZmE2Y2Y0NTlmNGI2MjlkMTkyYzEiLCJleHAiOjE2ODI5NTAzNDkuNzM5OTcxfQ.Cqy32y4AuXqoP6NFkw9Sv5EuJRsOYe0Qo8l0hAJ8JhE"
 ```
 
 ```bash
