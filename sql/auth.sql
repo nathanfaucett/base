@@ -24,19 +24,14 @@ AS $function$
 	END;
 $function$;
 
-
-CREATE TABLE auth.jwt_secret (
-	id serial4 NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"value" text NOT NULL,
-	expires_in interval NOT NULL,
-	created_at timestamptz NOT NULL DEFAULT now(),
-	updated_at timestamptz NOT NULL DEFAULT now(),
-	CONSTRAINT jwt_secret_pk PRIMARY KEY (id)
-);
-CREATE UNIQUE INDEX jwt_secret_name_uindex ON auth.jwt_secret USING btree ("name");
-
-GRANT SELECT ON TABLE auth.jwt_secret TO "user";
+CREATE FUNCTION auth.role()
+	RETURNS text
+	LANGUAGE plpgsql
+AS $function$
+	BEGIN
+		RETURN current_setting('request.jwt.claims', true)::json->>'role';
+	END;
+$function$;
 
 
 CREATE FUNCTION auth.url_encode(data bytea) RETURNS text LANGUAGE sql AS $$
@@ -148,3 +143,17 @@ AS $function$
 		RETURN jwt;
 	END;
 $function$;
+
+
+CREATE TABLE auth.jwt_secret (
+	id serial4 NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"value" text NOT NULL,
+	expires_in interval NOT NULL,
+	created_at timestamptz NOT NULL DEFAULT now(),
+	updated_at timestamptz NOT NULL DEFAULT now(),
+	CONSTRAINT jwt_secret_pk PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX jwt_secret_name_uindex ON auth.jwt_secret USING btree ("name");
+
+GRANT SELECT ON TABLE auth.jwt_secret TO "user";

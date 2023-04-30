@@ -20,8 +20,8 @@ echo "Running"
 psql -v ON_ERROR_STOP=1 <<EOL
 BEGIN;
 \i sql/roles.sql
-\i sql/private.sql
 \i sql/auth.sql
+\i sql/private.sql
 \i sql/public.sql
 INSERT INTO auth.jwt_secret ("name", "value", expires_in) VALUES ('postgrest', '$PGRST_JWT_SECRET', '1 day');
 COMMIT;

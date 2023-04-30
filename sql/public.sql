@@ -1,50 +1,15 @@
-CREATE TABLE public."user" (
-	id serial4 NOT NULL,
-	"role" varchar(255) NOT NULL DEFAULT 'user',
-	username varchar(255) NOT NULL,
-	encrypted_password varchar(71) NOT NULL,
-	active boolean NOT NULL DEFAULT true,
-	confirmed boolean NOT NULL DEFAULT false,
-	created_at timestamptz NOT NULL DEFAULT now(),
-	updated_at timestamptz NOT NULL DEFAULT now(),
-	CONSTRAINT user_pk PRIMARY KEY (id)
-);
-CREATE UNIQUE INDEX user_username_uindex ON public."user" USING btree (username);
+CREATE VIEW public."user" AS
+SELECT id, "role", username, active, confirmed, created_at, updated_at
+FROM "private"."user";
 
 GRANT ALL ON TABLE public."user" TO "user";
 
--- ALTER TABLE public."user" ENABLE ROW LEVEL SECURITY;
 
--- CREATE POLICY public_user_policy
--- 	ON public."user"
--- 	USING (auth.id() = id);
-
-
-CREATE TABLE public.email (
-	id serial4 NOT NULL,
-	user_id serial4 NOT NULL,
-	email varchar(320) NOT NULL,
-	"primary" boolean NOT NULL DEFAULT false,
-	confirmed boolean NOT NULL DEFAULT false,
-	created_at timestamptz NOT NULL DEFAULT now(),
-	updated_at timestamptz NOT NULL DEFAULT now(),
-	CONSTRAINT email_pk PRIMARY KEY (id),
-	CONSTRAINT email_user_id_fk FOREIGN KEY (user_id) REFERENCES public."user"(id) ON DELETE CASCADE
-);
-CREATE UNIQUE INDEX email_user_id_email_uindex ON public."email" USING btree (user_id, email);
+CREATE VIEW public.email AS
+SELECT id, user_id, email, "primary", confirmed, created_at, updated_at
+FROM "private"."email";
 
 GRANT ALL ON TABLE public.email TO "user";
-
--- ALTER TABLE public.email ENABLE ROW LEVEL SECURITY;
-
--- CREATE POLICY public_email_policy
--- 	ON public.email
--- 	USING (auth.id() = user_id);
-
-
-INSERT INTO public."user" 
-	("role", username, encrypted_password, confirmed) 
-	VALUES ('admin', 'admin', auth.crypt('admin', auth.gen_salt('bf')), true);
 
 
 CREATE FUNCTION public.user_sign_up(p_username text, p_password text, p_password_confirmation text)
@@ -82,13 +47,13 @@ AS $function$
 
 		SET ROLE "user";
 
-		INSERT INTO public."user" 
+		INSERT INTO "private"."user" 
 			(username, encrypted_password) 
 			VALUES (p_username, auth.crypt(p_password, auth.gen_salt('bf')));
 		
 		sub := (
 			SELECT u.id 
-			FROM public."user" u 
+			FROM "private"."user" u 
 			WHERE u.username=p_username 
 			LIMIT 1
 		);
@@ -118,7 +83,7 @@ AS $function$
 				SELECT 
 					sub::text as sub,
 					email,
-					(SELECT u.role FROM public."user" u WHERE u.id=sub) as "role",
+					(SELECT u.role FROM "private"."user" u WHERE u.id=sub) as "role",
 					md5(random()::text) as nonce,
 					extract(epoch from (now() + jwt_expires_in)) as exp
 			) j
@@ -146,7 +111,7 @@ AS $function$
 
 		sub := (
 			SELECT u.id
-			FROM public."user" u
+			FROM "private"."user" u
 			WHERE u.username=p_username AND u.encrypted_password=auth.crypt(p_password, u.encrypted_password)
 			LIMIT 1
 		);
@@ -156,7 +121,7 @@ AS $function$
 
 		email := (
 			SELECT e.email 
-			FROM public.email e 
+			FROM "private".email e 
 			WHERE e.user_id=sub and e.primary=true
 			LIMIT 1
 		);
@@ -180,7 +145,7 @@ AS $function$
 				SELECT 
 					sub::text as sub,
 					email,
-					(SELECT u.role FROM public."user" u WHERE u.id=sub) as "role",
+					(SELECT u.role FROM "private"."user" u WHERE u.id=sub) as "role",
 					md5(random()::text) as nonce,
 					extract(epoch from (now() + jwt_expires_in)) as exp
 			) j
@@ -225,13 +190,13 @@ AS $function$
 		IF p_password != p_password_confirmation THEN
 			RAISE EXCEPTION 'password,p_password_confirmation:mismatch';
 		END IF;
-		IF EXISTS (SELECT u.id FROM public."user" u WHERE u.username=p_username) THEN
+		IF EXISTS (SELECT u.id FROM "private"."user" u WHERE u.username=p_username) THEN
 			RAISE EXCEPTION 'username:exists';
 		END IF;
 
 		sub := (
 			SELECT u.id
-			FROM public."user" u
+			FROM "private"."user" u
 			WHERE u.username=p_username AND u.encrypted_password=auth.crypt(p_old_password, u.encrypted_password)
 			LIMIT 1
 		);
@@ -239,11 +204,11 @@ AS $function$
 			RETURN NULL;
 		END IF;
 
-		UPDATE public."user" SET encrypted_password=auth.crypt(p_password, auth.gen_salt('bf')) WHERE id=sub;
+		UPDATE "private"."user" SET encrypted_password=auth.crypt(p_password, auth.gen_salt('bf')) WHERE id=sub;
 		
 		email := (
 			SELECT e.email 
-			FROM public.email e 
+			FROM "private".email e 
 			WHERE e.user_id=sub and e.primary=true
 			LIMIT 1
 		);
@@ -267,7 +232,7 @@ AS $function$
 				SELECT 
 					sub::text as sub,
 					email,
-					(SELECT u.role FROM public."user" u WHERE u.id=sub) as "role",
+					(SELECT u.role FROM "private"."user" u WHERE u.id=sub) as "role",
 					md5(random()::text) as nonce,
 					extract(epoch from (now() + jwt_expires_in)) as exp
 			) j
